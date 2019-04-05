@@ -1,0 +1,15 @@
+// {type:class}
+// {direction:topDown}
+[note: Habe das Main nur zur klaren Darstellung gemalt{bg:cornsilk}]
+[Main|assetDataPreparation : assetDataPreparation|authenticate();run(assetDataPreparation)]
+[Main]1-1>[AssetDataPreparation|mergeCSPFreshServiceData()]
+[AssetDataPreparation]1-1>[FreshServiceFactory|cred : UserConfiguration]
+[AssetDataPreparation]1-1>[PartnerCenterFactory|tenantId : String]
+[Main]1-1>[PartnerCenterAuthentication|CspAppId : String;CspDomain : String;cred : UserConfiguration|connectCSP()]
+[Main]1-1>[FreshServiceAuthentication|urlFreshService : string]
+[Main]1-*>[UserConfiguration|partnerCenterUserName : string;partnerCenterPassword : secureString;freshServiceUserName : string;freshServicePassword : secureString|setCredentials();getCredentials()]
+[PartnerCenterFactory]<1-*[PartnerCenterManageCustomer|customerId : string|getPCCustomer();getPCCustomerBillingProfile(tenantId);getPCServiceCostsByLine(tenantid)]
+[PartnerCenterFactory]<1-*[PartnerCenterManageOrders|getPCOrders(customerId)]
+[PartnerCenterFactory]<1-*[PartnerCenterManageSubscription|getPCSubscriptions(tenantid);getPCSubscriptionsAddons(tenantid,subscriptionid)]
+[PartnerCenterFactory]<1-*[PartnerCenterManageInvoices|getPCInvoices()]
+[FreshServiceFactory]<1-*[FreshServiceManageAssets|getFreshServiceDepartments(page);getCITypes(page);getAllCITypeFields(ciTypeNumber);getAssets([page);postAzureSubscription(valuestable);putAzureSubscriptionById(assetId,valuestable);deleteAzureSubscriptionById(assetId)]
