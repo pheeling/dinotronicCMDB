@@ -1,0 +1,6 @@
+ Alle Module oder Klassen müssen über das Module Environment geladen werden.
+
+ https://docs.microsoft.com/en-us/powershell/developer/module/installing-a-powershell-module
+
+ gewählter Modulpfad für Entwicklung und Produktion:
+resources/...

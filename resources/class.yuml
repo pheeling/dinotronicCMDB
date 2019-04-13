@@ -7,7 +7,7 @@
 [AssetDataPreparation]1-1>[PartnerCenterFactory|tenantId : String]
 [Main]1-1>[PartnerCenterAuthentication|CspAppId : String;CspDomain : String;cred : UserConfiguration|connectCSP()]
 [Main]1-1>[FreshServiceAuthentication|urlFreshService : string]
-[Main]1-*>[UserConfiguration|partnerCenterUserName : string;partnerCenterPassword : secureString;freshServiceUserName : string;freshServicePassword : secureString|setCredentials();getCredentials()]
+[Main]1-*>[UserConfiguration|partnerCenterUserName : string;partnerCenterPassword : secureString;freshServiceUserName : string;freshServicePassword : secureString;freshServiceAPIKey : securestring;nativePartnerCenterAppId : string;webPartnerCenterSecretKey : securestring;$tenantId : string|setCredentials();getCredentials();saveSecureString()]
 [PartnerCenterFactory]<1-*[PartnerCenterManageCustomer|customerId : string|getPCCustomer();getPCCustomerBillingProfile(tenantId);getPCServiceCostsByLine(tenantid)]
 [PartnerCenterFactory]<1-*[PartnerCenterManageOrders|getPCOrders(customerId)]
 [PartnerCenterFactory]<1-*[PartnerCenterManageSubscription|getPCSubscriptions(tenantid);getPCSubscriptionsAddons(tenantid,subscriptionid)]
