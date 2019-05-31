@@ -3,18 +3,16 @@ function Get-NewMain(){
 }
 
 class Main {
+    $partnerCenterAuthentication
 
     Main(){
-        $partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
-        $partnerCenterAuthentication.getPartnerCenterConsent()
-        $partnerCenterAuthentication.connectPartnerCenter()
+        $this.partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
+        $this.partnerCenterAuthentication.getPartnerCenterConsent()
+        $this.partnerCenterAuthentication.connectPartnerCenter()
+    }
 
-        Get-Command -Module PartnerCenter -Name "*Customer*"
-
-        $output = Get-PartnerCustomer
-        $output
-
-        $partnerCenterAuthentication.disconnectPartnerCenter()
+    stop(){
+        $this.partnerCenterAuthentication.disconnectPartnerCenter()
     }
 
 }
