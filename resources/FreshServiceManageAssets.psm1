@@ -11,8 +11,8 @@ class FreshServiceManageAssets {
         $this.userConfiguration = Get-NewUserConfiguration
     }
 
-    [Object] getFreshServiceDepartments([String] $page){
-        $url = "https://dinotronic.freshservice.com/itil/departments.json?page=$($page)"
+    [PSCustomObject] getFreshServiceDepartments([String] $page){
+        $url = "https://dinotronic.freshservice.com/api/v2/departments?page=$($page)"
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
         $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
@@ -24,12 +24,12 @@ class FreshServiceManageAssets {
         $departmentGet = $this.getFreshServiceDepartments($page)
         $departmentlist =@{}
 
-        while ($departmentGet.Length -ne 0) {
-            foreach ($entry in $departmentGet){
+        while ($departmentGet.departments.Length -ne 0) {
+            foreach ($entry in $departmentGet.departments){
                 $departmentlist += @{$entry.id = "$($entry.name)"}
             }
             $page++
-            $departmentGet = $this.freshServiceAsset.getFreshServiceDepartments($page)
+            $departmentGet = $this.getFreshServiceDepartments($page)
         }
     return $departmentlist
     }
