@@ -23,5 +23,5 @@ $partnerCenterCustomer = Get-NewPartnerCustomer
 $partnerCenterCustomerList = $partnerCenterCustomer.getPartnerCenterCustomer()
 $partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)
 $freshServiceAssets = Get-NewFreshServiceManageAssets
-$freshServiceAssets.getFreshServiceDepartments()
+$freshServiceAssets.getAllDepartmentsAsList()
 $main.stop()
