@@ -1,10 +1,11 @@
 function Get-NewUserConfiguration(){
-        return [UserConfiguration]::new()
+        return [UserConfiguration]::GetInstance()
 }
 
 class UserConfiguration {
     
     # Instanced Property
+    static [UserConfiguration] $instance
     [string] $freshServiceAPIKey = ""
     [String] $freshServiceAPIKeyXMLFileName = "$Global:resourcespath\${env:USERNAME}_freshServiceAPIKey.xml"
     [String] $nativePartnerCenterAppId = ""
@@ -12,6 +13,11 @@ class UserConfiguration {
     [pscredential] $webPartnerCenterCredentials
     [String] $webPartnerCenterAppXMLFileName = "$Global:resourcespath\${env:USERNAME}_webPartnerCenterApp.xml"
     [String] $tenantAndNativeAppXMLFileName = "$Global:resourcespath\${env:USERNAME}_TenantandNativeAppId.xml"
+
+    static [UserConfiguration] GetInstance() {
+        if ([UserConfiguration]::instance -eq $null) { [UserConfiguration]::instance = [UserConfiguration]::new() }
+          return [UserConfiguration]::instance
+    }
 
     UserConfiguration(){
         if ((Test-Path $this.webPartnerCenterAppXMLFileName) -and 
