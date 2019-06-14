@@ -22,6 +22,13 @@ $main = Get-NewMain
 $partnerCenterCustomer = Get-NewPartnerCustomer
 $partnerCenterCustomerList = $partnerCenterCustomer.getPartnerCenterCustomer()
 $partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)
-$freshServiceAssets = Get-NewFreshServiceManageAssets
-$freshServiceAssets.getAllDepartmentsAsList()
+$freshServiceItems = Get-NewFreshServiceManageAssets
+$assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types")
+$departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments")
+$assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets")
+
+Write-host $departmentsList
+Write-host $assetTypeList
+Write-Host $assetsList
+
 $main.stop()

@@ -11,26 +11,27 @@ class FreshServiceManageAssets {
         $this.userConfiguration = Get-NewUserConfiguration
     }
 
-    [PSCustomObject] getFreshServiceDepartments([String] $page){
-        $url = "https://dinotronic.freshservice.com/api/v2/departments?page=$($page)"
+    [Array] getFreshServiceItems([String] $type, [String] $page){
+        $url = "https://dinotronic.freshservice.com/api/v2/{0}?page={1}" -f $type, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
-        return $response
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
     }
 
-    [Hashtable] getAllDepartmentsAsList(){
+    # TODO Create interface for List generation
+    [Hashtable] getFreshServiceItemsAsList([string] $type){
         $page = 1
-        $departmentGet = $this.getFreshServiceDepartments($page)
-        $departmentlist =@{}
+        $items = $this.getFreshServiceItems($type,$page)
+        $itemsList =@{}
 
-        while ($departmentGet.departments.Length -ne 0) {
-            foreach ($entry in $departmentGet.departments){
-                $departmentlist += @{$entry.id = "$($entry.name)"}
+        while ($items.$($type).Count -ne 0) {
+            foreach ($entry in $items."$($type)"){
+                $itemslist += @{$entry.id = "$($entry.name)"}
             }
             $page++
-            $departmentGet = $this.getFreshServiceDepartments($page)
+            $items = $this.getFreshServiceItems($type,$page)
         }
-    return $departmentlist
+    return $itemsList
     }
+
 }
