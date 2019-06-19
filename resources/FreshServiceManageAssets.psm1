@@ -18,7 +18,6 @@ class FreshServiceManageAssets {
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
     }
 
-    # TODO Create interface for List generation
     [Hashtable] getFreshServiceItemsAsList([string] $type){
         $page = 1
         $items = $this.getFreshServiceItems($type,$page)

@@ -1,5 +1,4 @@
 #TODO Abstract Class Assets, Classdiagramm update
-#Singleton Pattern für userConfiguration
 
 $Global:srcPath = split-path -path $MyInvocation.MyCommand.Definition 
 $Global:mainPath = split-path -path $srcPath
