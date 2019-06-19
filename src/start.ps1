@@ -10,14 +10,15 @@ if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
     Install-Module -Name PartnerCenter
 } 
 
-Import-Module -Force "$resourcespath\Main.psm1"
 Import-Module -Force "$resourcespath\PartnerCenterAuthentication.psm1"
 Import-Module -Force "$resourcespath\UserConfiguration.psm1"
 Import-Module -Force "$resourcespath\ErrorHandling.psm1"
 Import-Module -Force "$resourcespath\PartnerCenterCustomer.psm1"
 Import-Module -Force "$resourcespath\FreshServiceManageAssets.psm1"
 
-$main = Get-NewMain
+$partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
+$partnerCenterAuthentication.getPartnerCenterConsent()
+$partnerCenterAuthentication.connectPartnerCenter()
 $partnerCenterCustomer = Get-NewPartnerCustomer
 $partnerCenterCustomerList = $partnerCenterCustomer.getPartnerCenterCustomer()
 $partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)
@@ -30,4 +31,4 @@ Write-host $departmentsList
 Write-host $assetTypeList
 Write-Host $assetsList
 
-$main.stop()
+$partnerCenterAuthentication.disconnectPartnerCenter()
