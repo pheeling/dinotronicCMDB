@@ -1,5 +1,3 @@
-#TODO Abstract Class Assets, Classdiagramm update
-
 $Global:srcPath = split-path -path $MyInvocation.MyCommand.Definition 
 $Global:mainPath = split-path -path $srcPath
 $Global:resourcespath = join-path -path "$mainPath" -ChildPath "resources"
@@ -15,6 +13,7 @@ Import-Module -Force "$resourcespath\UserConfiguration.psm1"
 Import-Module -Force "$resourcespath\ErrorHandling.psm1"
 Import-Module -Force "$resourcespath\PartnerCenterCustomer.psm1"
 Import-Module -Force "$resourcespath\FreshServiceManageAssets.psm1"
+Import-Module -Force "$resourcespath\GetHash.psm1"
 
 $partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
 $partnerCenterAuthentication.getPartnerCenterConsent()
@@ -27,6 +26,7 @@ $assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types", $f
 $departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", $false)
 $assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets", $true)
 $freshServiceCiTypeId = $assetTypeList.Keys | Where-Object { $assetTypeList[$_] -eq 'Azure / Office 365 Subscription' }
+$hash = Get-NewGetHash
 
 foreach ($customer in $partnerCenterCustomerList){
     write-host $customer.name
@@ -35,24 +35,28 @@ foreach ($customer in $partnerCenterCustomerList){
 
     foreach ($offer in $customer.syncroot){
 
+        if(!($offer.orderId)){
+            $offer.orderId = $hash.getHashValue("$($customer.name)$($departmentId)$($offer.EffectiveStartDate)$($offer.CommitmentEndDate)")
+        }
+
         $freshServiceMatch = $assetsList.Keys | Where-Object { 
-            #TODO Verification if delete or update job updates the right object
-            #$assetsList.$_.orderId -eq "$($offer.orderId)" -and 
+            $assetsList.$_.orderId -eq "$($offer.orderId)" -and 
             $assetsList.$_.offerId -eq "$($offer.offerId)" -and
             $assetsList.$_.companyName -eq $customer.name       
         }
-        Write-Host $offer
+        Write-Host $offer.OfferName
+        Write-Host $offer.orderId
         Write-Host $departmentId
 
-        if($null -eq $offer.orderId){
+        if([string]::IsNullOrEmpty($departmentId)){
             $valuestable =@{
                 asset =@{
                     name ="$($offer.OfferName)"
                     asset_type_id = $freshServiceCiTypeId
-                    department_id = $departmentId
                     type_fields = @{
                         status_7001248569 = "$($offer.status)"
                         offerid_7001248569 = "$($offer.offerId)"
+                        orderid_7001248569 = "$($offer.orderId)"
                         companyname_7001248569 = "$($customer.name)"
                         offername_7001248569 = "$($offer.OfferName)"
                         quantity_7001248569 = $offer.Quantity
@@ -84,10 +88,6 @@ foreach ($customer in $partnerCenterCustomerList){
                 }
             }
         }
-        
-
-        #TODO Check Update and delete function not match with FreshServiceMatch
-        #TODO OfferId is not unique in combination with Name. Have to check orderId
         if($offer.status -eq "deleted" -and $freshServiceMatch){
             $freshServiceItems.deleteFreshServiceItem($assetsList.$freshServiceMatch.displayId)
         } elseif ($offer.status -ne "deleted" -and $freshServiceMatch){
