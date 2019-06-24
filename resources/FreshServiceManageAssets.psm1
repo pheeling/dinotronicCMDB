@@ -15,20 +15,20 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?page={1}" -f $type, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
     [Object] getFreshServiceItemsIncludeFields([String] $type, [String] $page){
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?page={1}&include=type_fields" -f $type, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET" #-Debug -Verbose #-ErrorAction SilentlyContinue
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
     [Hashtable] getFreshServiceItemsAsList([string] $type, [boolean] $typefields){
         $page = 1
         $itemsList =@{}
-        if($typefields){
+        if($typefields -eq $true){
             $items = $this.getFreshServiceItemsIncludeFields($type,$page)
             while ($items.$($type).Count -ne 0) {
                 foreach ($entry in $items."$($type)"){
@@ -38,8 +38,8 @@ class FreshServiceManageAssets {
                                         "orderId" = $entry.type_fields.orderid_7001248569
                                         "companyName" = $entry.type_fields.companyname_7001248569
                                         "offerName" = $entry.type_fields.offername_7001248569
+                                        }
                                     }
-                    }
                 }
                 $page++
                 $items = $this.getFreshServiceItemsIncludeFields($type,$page)
@@ -62,9 +62,7 @@ class FreshServiceManageAssets {
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
         $json = $valuestable | ConvertTo-Json
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
-        return $response
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
     }
 
     [Array] createFreshServiceItem([Hashtable] $valuestable){
@@ -72,17 +70,13 @@ class FreshServiceManageAssets {
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
         $json = $valuestable | ConvertTo-Json
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body $json #-Debug -Verbose #-ErrorAction SilentlyContinue
-        return $response
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
     }
 
     [Array] deleteFreshServiceItem([String] $assetId){
         $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
-
-        $response = Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" #-Debug -Verbose #-ErrorAction SilentlyContinue
-        return $response
+        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
     }
 }

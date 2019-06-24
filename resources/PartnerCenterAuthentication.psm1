@@ -31,7 +31,7 @@ class PartnerCenterAuthentication {
             -ApplicationId $this.userConfiguration.nativePartnerCenterAppId `
             -TenantId $this.userConfiguration.tenantId
         } catch {
-            Write-host "DT: Issue connecting CSP Data: $PSItem"
+            "DT: Issue connecting CSP Data: $PSItem" >> $Global:logFile
             #Get-NewErrorHandling "DT: Issue connection CSP Data" $PSItem
         }
         
@@ -48,14 +48,15 @@ class PartnerCenterAuthentication {
                 $this.partnercenterRefreshToken | Export-Clixml -Path $this.refreshTokenXMLFileName
             }
         } catch {
-            Write-host "DT: Issue creating or getting the RefreshToken CSP Data: $PSItem"
+            "DT: Issue creating or getting the RefreshToken CSP Data: $PSItem" >> $Global:logFile
             #Get-NewErrorHandling "DT: Issue creating or getting the RefreshToken CSP Data" $PSItem
         }
         
     }
 
     disconnectPartnerCenter (){
-        Disconnect-PartnerCenter -Verbose
+        Write-Host "i just got triggered"
+        Disconnect-PartnerCenter -Verbose -Debug
     }
 
 }

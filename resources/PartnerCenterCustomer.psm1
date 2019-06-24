@@ -9,20 +9,24 @@ class PartnerCenterCustomer {
     }
 
     [PSCustomObject] getPartnerCenterCustomer(){
-        return Get-PartnerCustomer
+        return Get-PartnerCustomer | Sort-Object -Property Name
     }
 
     [PSCustomObject] getPartnerCenterSubscriptions([PSCustomObject] $partnerCenterCustomer){
-        #Extending customer object with subscriptions
-        foreach ($item in $partnerCenterCustomer){
-            $subscriptions = Get-PartnerCustomerSubscription -CustomerId $item.CustomerId | 
-            Select-Object -Property offerId,orderId,offerName,quantity,effectiveStartDate,commitmentEndDate,status,billingCycle
-            $properties = Get-Member -InputObject $subscriptions -MemberType Property
-            foreach ($p in $properties)
-            {
-                $item | Add-Member -MemberType NoteProperty -Name $p.Name -Value $subscriptions.$($p.Name) -Force
+        try {
+            #Extending customer object with subscriptions
+            foreach ($item in $partnerCenterCustomer){
+                $subscriptions = @()
+                $subscriptions = Get-PartnerCustomerSubscription -CustomerId $item.CustomerId | 
+                Select-Object -Property offerId,orderId,offerName,quantity,effectiveStartDate,commitmentEndDate,status,billingCycle |
+                Sort-Object -Property offerName
+                $item | Add-Member -MemberType NoteProperty -Name SubscriptionsList -Value $subscriptions -Force
             }
-        }
-        return $partnerCenterCustomer
+            return $partnerCenterCustomer 
+        } catch {
+           "DT: error with subscription adding: $PSItem" >> $Global:logFile
+            return $partnerCenterCustomer
+        }   
+        return $partnerCenterCustomer 
     }
 }
