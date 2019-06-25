@@ -33,22 +33,22 @@ $hash = Get-NewGetHash
 
 foreach ($customer in $partnerCenterCustomerList){
     $index = 0
-    "$(Get-Date) [Customer Processing] Start--------------------------" >> $Global:logFile
-    "$(Get-Date) [Customer Processing] Customername: $($customer.name)" >> $Global:logFile
-    "$(Get-Date) [Customer Processing] CustomerID: $($customer.customerid)" >> $Global:logFile
+    # "$(Get-Date) [Customer Processing] Start--------------------------" >> $Global:logFile
+    # "$(Get-Date) [Customer Processing] Customername: $($customer.name)" >> $Global:logFile
+    # "$(Get-Date) [Customer Processing] CustomerID: $($customer.customerid)" >> $Global:logFile
     $departmentId = $departmentsList.Keys | Where-Object { $departmentsList[$_] -eq "$($customer.name)" }
 
     foreach ($offer in $customer.SubscriptionsList){
         $index++
-        "$(Get-Date) [Offer Processing] Start--------------------------" >> $Global:logFile
-        "$(Get-Date) [Offer Processing] OfferName: $($offer.OfferName)" >> $Global:logFile
-        "$(Get-Date) [Offer Processing] OrderID: $($offer.orderId)" >> $Global:logFile
-        "$(Get-Date) [Offer Processing] DepartmentID: $($departmentId)" >> $Global:logFile
+        # "$(Get-Date) [Offer Processing] Start--------------------------" >> $Global:logFile
+        # "$(Get-Date) [Offer Processing] OfferName: $($offer.OfferName)" >> $Global:logFile
+        # "$(Get-Date) [Offer Processing] OrderID: $($offer.orderId)" >> $Global:logFile
+        # "$(Get-Date) [Offer Processing] DepartmentID: $($departmentId)" >> $Global:logFile
 
         if(!($offer.orderId)){
             $offer.orderId = $hash.getHashValue("$($index)$($departmentId)$($offer.EffectiveStartDate)$($offer.CommitmentEndDate)")
-            "$(Get-Date) [Offer Processing] replaced offer.orderid" >> $Global:logFile
-            "$(Get-Date) [Offer Processing] new OrderID: $($offer.orderId)" >> $Global:logFile
+            # "$(Get-Date) [Offer Processing] replaced offer.orderid" >> $Global:logFile
+            # "$(Get-Date) [Offer Processing] new OrderID: $($offer.orderId)" >> $Global:logFile
         }
 
         $freshServiceMatch = $assetsList.Keys | Where-Object { 
@@ -82,21 +82,20 @@ foreach ($customer in $partnerCenterCustomerList){
 
         if($offer.status -eq "deleted" -and $freshServiceMatch){
             &{$freshServiceItems.deleteFreshServiceItem($assetsList.$freshServiceMatch.displayId)} 3>&1 2>&1 >> $Global:logFile
-            "$(Get-Date) [Freshservice Delete] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
+            # "$(Get-Date) [Freshservice Delete] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         } elseif ($offer.status -ne "deleted" -and $freshServiceMatch){
             &{$freshServiceItems.updateFreshServiceItem($assetsList.$freshServiceMatch.displayId,$valuestable)} 3>&1 2>&1 >> $Global:logFile
-            "$(Get-Date) [Freshservice Update] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
+            # "$(Get-Date) [Freshservice Update] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         } elseif ($offer.status -ne "deleted") {
             &{$freshServiceItems.createFreshServiceItem($valuestable)} 3>&1 2>&1 >> $Global:logFile
-            "$(Get-Date) [Freshservice Created] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
+            # "$(Get-Date) [Freshservice Created] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         } else {
-            "$(Get-Date) [Freshservice uncertain action] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
+            # "$(Get-Date) [Freshservice uncertain action] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         }
-        "$(Get-Date) [Offer Processing] Stop--------------------------" >> $Global:logFile
+        # "$(Get-Date) [Offer Processing] Stop--------------------------" >> $Global:logFile
     }
-    "$(Get-Date) [Customer Processing] Stop--------------------------" >> $Global:logFile
+    # "$(Get-Date) [Customer Processing] Stop--------------------------" >> $Global:logFile
 }
 
-#TODO Processing of Items suddenly stop at LCR Services, previously stopped at Laborgemeinschaft. what could that be?
 $partnerCenterAuthentication.disconnectPartnerCenter()
 "$(Get-Date) [STOP] script" >> $Global:logFile
