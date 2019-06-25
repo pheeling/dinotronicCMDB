@@ -55,8 +55,7 @@ class PartnerCenterAuthentication {
     }
 
     disconnectPartnerCenter (){
-        Write-Host "i just got triggered"
-        Disconnect-PartnerCenter -Verbose -Debug
+        Disconnect-PartnerCenter -Verbose
     }
 
 }
