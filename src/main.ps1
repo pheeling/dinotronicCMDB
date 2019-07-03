@@ -10,7 +10,7 @@ if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
         Install-Module -Name PartnerCenter
     } catch {
         Write-Host "Error while installing Partner Center Module"
-        Exit-PSSession
+        exit
     }
 }
 
