@@ -104,3 +104,6 @@ foreach ($customer in $partnerCenterCustomerList){
 
 $partnerCenterAuthentication.disconnectPartnerCenter()
 "$(Get-Date) [STOP] script" >> $Global:logFile
+if ($Global:logFile.Length -gt 5120Kb) {
+    Remove-Item -Path $Global:logFile
+}
