@@ -6,7 +6,12 @@ $Global:logFile = "$resourcespath\processing.log"
 
 #Requirementcheck PartnerCenter Module
 if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
-    Install-Module -Name PartnerCenter
+    try {
+        Install-Module -Name PartnerCenter
+    } catch {
+        Write-Host "Error while installing Partner Center Module"
+        Exit-PSSession
+    }
 }
 
 Import-Module -Force "$resourcespath\PartnerCenterAuthentication.psm1"
