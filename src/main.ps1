@@ -81,7 +81,7 @@ foreach ($customer in $partnerCenterCustomerList){
             }
         }
 
-        if([string]::IsNullOrEmpty($departmentId)){
+        if(-not [string]::IsNullOrEmpty($departmentId)){
             $valuestable.asset.department_id = $departmentId
         } 
 
