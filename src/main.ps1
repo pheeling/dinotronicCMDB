@@ -19,7 +19,9 @@ Import-Module -Force "$resourcespath\UserConfiguration.psm1"
 Import-Module -Force "$resourcespath\ErrorHandling.psm1"
 Import-Module -Force "$resourcespath\PartnerCenterCustomer.psm1"
 Import-Module -Force "$resourcespath\FreshServiceManageAssets.psm1"
+Import-Module -Force "$resourcespath\FreshServiceManageRelationships.psm1"
 Import-Module -Force "$resourcespath\GetHash.psm1"
+
 
 "$(Get-Date) [START] script" >> $Global:logFile
 
@@ -100,6 +102,28 @@ foreach ($customer in $partnerCenterCustomerList){
         # "$(Get-Date) [Offer Processing] Stop--------------------------" >> $Global:logFile
     }
     # "$(Get-Date) [Customer Processing] Stop--------------------------" >> $Global:logFile
+}
+$assetTypeList = $freshServiceItems.getFreshServiceItems("asset_types", 1)
+$freshServiceRelationships = Get-NewFreshServiceManageRelationships
+
+#Look for Dinotronic Managed Services
+$results = $assetTypeList.asset_types | Where-Object {$_.parent_asset_type_id -eq 7001249774 }
+$services = $results | ForEach-Object {$freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.id, 1)}
+$x = 1
+$Global:hash = @{}
+Foreach ($service in $services.assets){
+    "Service $x" >> $Global:logFile
+    $freshServiceRelationships.getRelationships($service.display_id)
+    "$(Get-Date) " + $Global:hash["$($service.display_id)"] >> $Global:logFile
+    $x++
+    $quantitytable =@{
+        asset =@{
+            type_fields = @{
+                quantity_7001249774 = $Global:hash["$($service.display_id)"]
+            } 
+        }
+    }
+    &{$freshServiceItems.updateFreshServiceItem($service.display_id,$quantitytable)} 3>&1 2>&1 >> $Global:logFile
 }
 
 $partnerCenterAuthentication.disconnectPartnerCenter()

@@ -1,11 +1,17 @@
 function Get-NewFreshServiceManageAssets(){
-    return [FreshServiceManageAssets]::new()
+    return [FreshServiceManageAssets]::GetInstance()
 }
 
 class FreshServiceManageAssets {
 
     #Instanced Properties
+    static [FreshServiceManageAssets] $instance
     $userConfiguration
+
+    static [FreshServiceManageAssets] GetInstance() {
+        if ([FreshServiceManageAssets]::instance -eq $null) { [FreshServiceManageAssets]::instance = [FreshServiceManageAssets]::new() }
+            return [FreshServiceManageAssets]::instance
+    }
 
     FreshServiceManageAssets (){
         $this.userConfiguration = Get-NewUserConfiguration
