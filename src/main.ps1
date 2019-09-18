@@ -110,7 +110,7 @@ $freshServiceRelationships = Get-NewFreshServiceManageRelationships
 $results = $assetTypeList.asset_types | Where-Object {$_.parent_asset_type_id -eq 7001249774 }
 $services = $results | ForEach-Object {$freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.id, 1)}
 $x = 1
-#TODO Detach from Global Hash and work with Return statement
+
 $Global:hash = @{}
 Foreach ($service in $services.assets){
     "Service $x" >> $Global:logFile
