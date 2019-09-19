@@ -20,6 +20,9 @@ class FreshServiceManageRelationships {
             Foreach ($relationship in $relationships.relationships){
                 if ($relationship.relationship_type -eq "forward_relationship") {
                     $childitems = $this.freshServiceItems.getFreshServiceItems("assets/{0}" -f $relationship.config_item.display_id)
+                    If (($childitems.asset.asset_type_id -eq 7001248569) -and ($childitems.asset.type_fields.hasrelationship_7001248569 -eq $false)){
+                        $this.setRelationshipStatus($childitems)
+                    }
                     $this.getRelationships($childitems.asset.display_id)
                     If ($Global:hash.ContainsKey($display_id) ){
                         $Global:hash[$display_id] = ($Global:hash[$display_id], $Global:hash["$($childitems.asset.display_id)"] | Measure-Object -Max).Maximum
@@ -36,5 +39,16 @@ class FreshServiceManageRelationships {
             }
             $Global:hash[$display_id] >> $Global:logFile
         }
+    }
+
+    setRelationshipStatus([System.Object] $childitems){
+        $hasrelationshiptable =@{
+            asset =@{
+                type_fields = @{
+                    hasrelationship_7001248569 = $true
+                } 
+            }
+        }
+        &{$freshServiceItems.updateFreshServiceItem($childitems.asset.display_id,$hasrelationshiptable)} 3>&1 2>&1 >> $Global:logFile
     }
 }
