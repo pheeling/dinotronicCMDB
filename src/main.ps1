@@ -61,7 +61,7 @@ foreach ($customer in $partnerCenterCustomerList){
         $freshServiceMatch = $assetsList.Keys | Where-Object { 
             $assetsList.$_.orderId -eq "$($offer.orderId)" -and 
             $assetsList.$_.offerId -eq "$($offer.offerId)" -and
-            $assetsList.$_.companyName -eq $customer.name       
+            $assetsList.$_.companyName -like "*$($customer.name)*"
         }
 
         $valuestable =@{
@@ -85,7 +85,12 @@ foreach ($customer in $partnerCenterCustomerList){
 
         if(-not [string]::IsNullOrEmpty($departmentId)){
             $valuestable.asset.department_id = $departmentId
-        } 
+        }
+        
+        #set Company Name from Freshservice instead of CSP Source <Issue #10: dinotronicCMDB github>
+        if(-not [string]::IsNullOrEmpty($freshServiceMatch)){
+            $valuestable.asset.type_fields.companyname_7001248569 = $assetsList.$freshServiceMatch.companyName
+        }
 
         if($offer.status -eq "deleted" -and $freshServiceMatch){
             &{$freshServiceItems.deleteFreshServiceItem($assetsList.$freshServiceMatch.displayId)} 3>&1 2>&1 >> $Global:logFile
