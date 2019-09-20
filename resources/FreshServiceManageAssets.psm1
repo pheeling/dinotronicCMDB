@@ -66,6 +66,7 @@ class FreshServiceManageAssets {
                                         "orderId" = $entry.type_fields.orderid_7001248569
                                         "companyName" = $entry.type_fields.companyname_7001248569
                                         "offerName" = $entry.type_fields.offername_7001248569
+                                        "domain" = $entry.type_fields.domain_7001248569
                                         }
                                     }
                 }

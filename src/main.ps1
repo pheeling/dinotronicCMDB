@@ -43,7 +43,7 @@ foreach ($customer in $partnerCenterCustomerList){
     # "$(Get-Date) [Customer Processing] Start--------------------------" >> $Global:logFile
     # "$(Get-Date) [Customer Processing] Customername: $($customer.name)" >> $Global:logFile
     # "$(Get-Date) [Customer Processing] CustomerID: $($customer.customerid)" >> $Global:logFile
-    $departmentId = $departmentsList.Keys | Where-Object { $departmentsList[$_] -eq "$($customer.name)" }
+    $departmentId = $departmentsList.Keys | Where-Object { $departmentsList[$_] -like "*$($customer.name)*" }
 
     foreach ($offer in $customer.SubscriptionsList){
         $index++
@@ -61,9 +61,10 @@ foreach ($customer in $partnerCenterCustomerList){
         $freshServiceMatch = $assetsList.Keys | Where-Object { 
             $assetsList.$_.orderId -eq "$($offer.orderId)" -and 
             $assetsList.$_.offerId -eq "$($offer.offerId)" -and
-            $assetsList.$_.companyName -like "*$($customer.name)*"
+            $assetsList.$_.companyName -like "*$($customer.name)*" -and
+            $assetsList.$_.domain -eq "$($customer.domain)"
         }
-
+        
         $valuestable =@{
             asset =@{
                 name ="$($offer.OfferName)"
@@ -74,6 +75,7 @@ foreach ($customer in $partnerCenterCustomerList){
                     orderid_7001248569 = "$($offer.orderId)"
                     companyname_7001248569 = "$($customer.name)"
                     offername_7001248569 = "$($offer.OfferName)"
+                    domain_7001248569 = "$($customer.domain)"
                     quantity_7001248569 = $offer.Quantity
                     #unitprice_7001248569 = "$($unitPrice)"
                     billingcycle_7001248569 = "$($offer.billingCycle)"
@@ -83,13 +85,8 @@ foreach ($customer in $partnerCenterCustomerList){
             }
         }
 
-        if(-not [string]::IsNullOrEmpty($departmentId)){
+        if((-not [string]::IsNullOrEmpty($departmentId)) -and ($departmentId -isnot [array])){
             $valuestable.asset.department_id = $departmentId
-        }
-        
-        #set Company Name from Freshservice instead of CSP Source <Issue #10: dinotronicCMDB github>
-        if(-not [string]::IsNullOrEmpty($freshServiceMatch)){
-            $valuestable.asset.type_fields.companyname_7001248569 = $assetsList.$freshServiceMatch.companyName
         }
 
         if($offer.status -eq "deleted" -and $freshServiceMatch){
