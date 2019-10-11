@@ -18,7 +18,7 @@ class PartnerCenterCustomer {
                 $subscriptions = @()
                 try {
                     $subscriptions = Get-PartnerCustomerSubscription -CustomerId $item.CustomerId | 
-                    Select-Object -Property offerId,orderId,offerName,quantity,effectiveStartDate,commitmentEndDate,status,billingCycle |
+                    Select-Object -Property offerId,SubscriptionId,offerName,quantity,effectiveStartDate,commitmentEndDate,status,billingCycle |
                     Sort-Object -Property offerName
                     $item | Add-Member -MemberType NoteProperty -Name SubscriptionsList -Value $subscriptions -Force
                 } catch {

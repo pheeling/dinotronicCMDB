@@ -52,14 +52,8 @@ foreach ($customer in $partnerCenterCustomerList){
         # "$(Get-Date) [Offer Processing] OrderID: $($offer.orderId)" >> $Global:logFile
         # "$(Get-Date) [Offer Processing] DepartmentID: $($departmentId)" >> $Global:logFile
 
-        if(!($offer.orderId)){
-            $offer.orderId = $hash.getHashValue("$($index)$($departmentId)$($offer.EffectiveStartDate)$($offer.CommitmentEndDate)")
-            # "$(Get-Date) [Offer Processing] replaced offer.orderid" >> $Global:logFile
-            # "$(Get-Date) [Offer Processing] new OrderID: $($offer.orderId)" >> $Global:logFile
-        }
-
         $freshServiceMatch = $assetsList.Keys | Where-Object { 
-            $assetsList.$_.orderId -eq "$($offer.orderId)" -and 
+            $assetsList.$_.orderId -eq "$($offer.SubscriptionId)" -and 
             $assetsList.$_.offerId -eq "$($offer.offerId)" -and
             $assetsList.$_.companyName -like "*$($customer.name)*" -and
             $assetsList.$_.domain -eq "$($customer.domain)"
@@ -72,7 +66,7 @@ foreach ($customer in $partnerCenterCustomerList){
                 type_fields = @{
                     status_7001248569 = "$($offer.status)"
                     offerid_7001248569 = "$($offer.offerId)"
-                    orderid_7001248569 = "$($offer.orderId)"
+                    orderid_7001248569 = "$($offer.SubscriptionId)"
                     companyname_7001248569 = "$($customer.name)"
                     offername_7001248569 = "$($offer.OfferName)"
                     domain_7001248569 = "$($customer.domain)"

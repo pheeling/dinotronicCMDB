@@ -94,7 +94,7 @@ class FreshServiceManageAssets {
             $json = $valuestable | ConvertTo-Json
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
         } catch {
-            "DT: Updating FreshServiceItem: $PSItem" >> $Global:logFile
+            #"DT: Updating FreshServiceItem: $PSItem" >> $Global:logFile
             Get-NewErrorHandling "DT: Updating FreshServiceItem" $PSItem
             return $null
         }
@@ -108,7 +108,7 @@ class FreshServiceManageAssets {
             $json = $valuestable | ConvertTo-Json
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
         } catch {
-            "DT: Creating FreshServiceItem: $PSItem" >> $Global:logFile
+            #"DT: Creating FreshServiceItem: $PSItem" >> $Global:logFile
             Get-NewErrorHandling "DT: Creating FreshServiceItem" $PSItem
             return $null
         }
@@ -121,7 +121,7 @@ class FreshServiceManageAssets {
             $headers = @{Authorization="Basic $($base64AuthInfo)"}
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
         } catch {
-            "DT: Deleting FreshServiceItem: $PSItem" >> $Global:logFile
+            #"DT: Deleting FreshServiceItem: $PSItem" >> $Global:logFile
             Get-NewErrorHandling "DT: Deleting FreshServiceItem" $PSItem
             return $null
         }
