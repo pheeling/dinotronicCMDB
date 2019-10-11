@@ -4,7 +4,7 @@ function Get-NewErrorHandling($errorSubject, $errorBody){
 
 class ErrorHandling {
 
-    [String] $recipient = "hiestand@dinotronic.ch"
+    [String] $recipient = "helpdesk@dinotronic.ch"
     [String] $sender = "tech@dinotronic.ch"
     [String] $smtpSender = "dtcpsmg.hostedbusiness.ch"
     [String] $errorSubject

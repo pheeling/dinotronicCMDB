@@ -45,7 +45,7 @@ class FreshServiceManageRelationships {
         $hasrelationshiptable =@{
             asset =@{
                 type_fields = @{
-                    hasrelationship_7001248569 = $true
+                    hasrelationshipdropdown_7001248569 = "Yes"
                 } 
             }
         }
