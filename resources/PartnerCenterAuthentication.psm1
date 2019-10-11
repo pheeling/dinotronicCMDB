@@ -32,7 +32,7 @@ class PartnerCenterAuthentication {
             -TenantId $this.userConfiguration.tenantId
         } catch {
             "DT: Issue connecting CSP Data: $PSItem" >> $Global:logFile
-            #Get-NewErrorHandling "DT: Issue connection CSP Data" $PSItem
+            Get-NewErrorHandling "DT: Issue connection CSP Data" $PSItem
         }
         
     }
@@ -49,7 +49,7 @@ class PartnerCenterAuthentication {
             }
         } catch {
             "DT: Issue creating or getting the RefreshToken CSP Data: $PSItem" >> $Global:logFile
-            #Get-NewErrorHandling "DT: Issue creating or getting the RefreshToken CSP Data" $PSItem
+            Get-NewErrorHandling "DT: Issue creating or getting the RefreshToken CSP Data" $PSItem
         }
         
     }
