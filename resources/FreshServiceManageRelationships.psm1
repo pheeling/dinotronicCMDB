@@ -4,7 +4,7 @@ function Get-NewFreshServiceManageRelationships(){
 
 class FreshServiceManageRelationships {
 
-    $freshServiceItems = ""
+    $freshServiceItems
 
     FreshServiceManageRelationships (){
         $this.freshServiceItems = Get-NewFreshServiceManageAssets
@@ -49,6 +49,6 @@ class FreshServiceManageRelationships {
                 } 
             }
         }
-        &{$freshServiceItems.updateFreshServiceItem($childitems.asset.display_id,$hasrelationshiptable)} 3>&1 2>&1 >> $Global:logFile
+        &{$this.freshServiceItems.updateFreshServiceItem($childitems.asset.display_id,$hasrelationshiptable)} 3>&1 2>&1 >> $Global:logFile
     }
 }
