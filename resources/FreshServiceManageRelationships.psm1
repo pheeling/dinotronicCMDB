@@ -20,7 +20,7 @@ class FreshServiceManageRelationships {
             Foreach ($relationship in $relationships.relationships){
                 if ($relationship.relationship_type -eq "forward_relationship") {
                     $childitems = $this.freshServiceItems.getFreshServiceItems("assets/{0}" -f $relationship.config_item.display_id)
-                    If (($childitems.asset.asset_type_id -eq 7001248569) -and ($childitems.asset.type_fields.hasrelationship_7001248569 -eq $false)){
+                    If (($childitems.asset.asset_type_id -eq 7001248569) -and ($childitems.asset.type_fields.hasrelationshipdropdown_7001248569 -eq $null)){
                         $this.setRelationshipStatus($childitems)
                     }
                     $this.getRelationships($childitems.asset.display_id)
