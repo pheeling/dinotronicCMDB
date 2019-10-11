@@ -87,25 +87,43 @@ class FreshServiceManageAssets {
     }
 
     [Array] updateFreshServiceItem([String] $assetId, [Hashtable] $valuestable){
-        $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
-        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
-        $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        $json = $valuestable | ConvertTo-Json
-        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
+        try {
+            $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
+            $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
+            $headers = @{Authorization="Basic $($base64AuthInfo)"}
+            $json = $valuestable | ConvertTo-Json
+            return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
+        } catch {
+            "DT: Updating FreshServiceItem: $PSItem" >> $Global:logFile
+            Get-NewErrorHandling "DT: Updating FreshServiceItem" $PSItem
+            return $null
+        }
     }
 
     [Array] createFreshServiceItem([Hashtable] $valuestable){
-        $url = "https://dinotronic.freshservice.com/api/v2/assets"
-        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
-        $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        $json = $valuestable | ConvertTo-Json
-        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
+        try {
+            $url = "https://dinotronic.freshservice.com/api/v2/assets"
+            $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
+            $headers = @{Authorization="Basic $($base64AuthInfo)"}
+            $json = $valuestable | ConvertTo-Json
+            return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
+        } catch {
+            "DT: Creating FreshServiceItem: $PSItem" >> $Global:logFile
+            Get-NewErrorHandling "DT: Creating FreshServiceItem" $PSItem
+            return $null
+        }
     }
 
     [Array] deleteFreshServiceItem([String] $assetId){
-        $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
-        $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
-        $headers = @{Authorization="Basic $($base64AuthInfo)"}
-        return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
+        try {
+            $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
+            $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
+            $headers = @{Authorization="Basic $($base64AuthInfo)"}
+            return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
+        } catch {
+            "DT: Deleting FreshServiceItem: $PSItem" >> $Global:logFile
+            Get-NewErrorHandling "DT: Deleting FreshServiceItem" $PSItem
+            return $null
+        }
     }
 }
