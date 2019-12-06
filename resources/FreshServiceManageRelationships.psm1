@@ -13,7 +13,6 @@ class FreshServiceManageRelationships {
     getRelationships([String] $display_id){
         $display_id >> $Global:logFile
         If (-not $Global:hash.ContainsKey($display_id) ){
-            #$childitems.getFreshServiceItems("assets/{0}" -f $display_id)
             $relationships = $this.freshServiceItems.getFreshServiceItemsRelationships($display_id, 1)
             "$($relationships.relationships.config_item.display_id), $($relationships.relationships.relationship_type)" >> $Global:logFile
             $end = 0

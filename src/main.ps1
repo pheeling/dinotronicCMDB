@@ -103,7 +103,7 @@ $assetTypeList = $freshServiceItems.getFreshServiceItems("asset_types", 1)
 $freshServiceRelationships = Get-NewFreshServiceManageRelationships
 
 #Look for Dinotronic Managed Services
-$results = $assetTypeList.asset_types | Where-Object {$_.parent_asset_type_id -eq 7001249774 }
+$results = $assetTypeList.asset_types | Where-Object {$_.parent_asset_type_id -eq 7001249774 -or $_.id -eq 7001249774 }
 $services = $results | ForEach-Object {$freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.id, 1)}
 $x = 1
 
