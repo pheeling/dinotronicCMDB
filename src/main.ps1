@@ -125,6 +125,6 @@ Foreach ($service in $services.assets){
 
 $partnerCenterAuthentication.disconnectPartnerCenter()
 "$(Get-Date) [STOP] script" >> $Global:logFile
-if (Get-ChildItem -path $global:logfile | where-object $_.length -gt 5,242,880) {
+if ((Get-ChildItem -path $logfile).Length -gt 5242880) {
     Remove-Item -Path $Global:logFile
 }
