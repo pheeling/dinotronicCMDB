@@ -142,10 +142,13 @@ Foreach ($service in $services.assets){
     $freshServiceRelationships.getRelationships($service.display_id)
     "$(Get-Date) " + $Global:hash["$($service.display_id)"] >> $Global:logFile
     $x++
+    $quantityTypeFieldName = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
+        if($_.Name -like "quantity*"){$_.Name}
+    }
     $quantitytable =@{
         asset =@{
             type_fields = @{
-                quantity_7001249774 = $Global:hash["$($service.display_id)"]
+                "$($quantityTypeFieldName)" = $Global:hash["$($service.display_id)"]
             } 
         }
     }
