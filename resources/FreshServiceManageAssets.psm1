@@ -21,6 +21,7 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?page={1}" -f $type, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $Global:APICalls++
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
@@ -28,6 +29,7 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?include=type_fields" -f $type
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $Global:APICalls++
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
@@ -35,6 +37,7 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?query=""{1}""&page={2}&include=type_fields" -f $type, $query, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $Global:APICalls++
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
@@ -42,6 +45,7 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?page={1}&include=type_fields" -f $type, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $Global:APICalls++
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
@@ -50,6 +54,7 @@ class FreshServiceManageAssets {
         $url = "https://dinotronic.freshservice.com/cmdb/items/{0}/relationships.json?page={1}" -f $displayid, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
+        $Global:APICalls++
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
@@ -92,6 +97,7 @@ class FreshServiceManageAssets {
             $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
             $headers = @{Authorization="Basic $($base64AuthInfo)"}
             $json = $valuestable | ConvertTo-Json
+            $Global:APICalls++
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
         } catch {
             #"DT: Updating FreshServiceItem: $PSItem" >> $Global:logFile
@@ -106,6 +112,7 @@ class FreshServiceManageAssets {
             $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
             $headers = @{Authorization="Basic $($base64AuthInfo)"}
             $json = $valuestable | ConvertTo-Json
+            $Global:APICalls++
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "POST" -Body ([System.Text.Encoding]::UTF8.GetBytes($json))
         } catch {
             #"DT: Creating FreshServiceItem: $PSItem" >> $Global:logFile
@@ -119,6 +126,7 @@ class FreshServiceManageAssets {
             $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
             $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
             $headers = @{Authorization="Basic $($base64AuthInfo)"}
+            $Global:APICalls++
             return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
         } catch {
             #"DT: Deleting FreshServiceItem: $PSItem" >> $Global:logFile

@@ -4,6 +4,9 @@ $Global:resourcespath = join-path -path "$mainPath" -ChildPath "resources"
 $Global:errorVariable = "Stop"
 $Global:logFile = "$resourcespath\processing.log"
 
+#Statistics
+$Global:APICalls = 0
+
 #Requirementcheck PartnerCenter Module
 if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
     try {
@@ -156,6 +159,9 @@ Foreach ($service in $services.assets){
 }
 
 $partnerCenterAuthentication.disconnectPartnerCenter()
+"$(Get-Date) [Statistics] ...................... ::::::::::::::::" >> $Global:logFile
+"$(Get-Date) [Statistics] FreshService API Calls $Global:APICalls" >> $Global:logFile
+"$(Get-Date) [Statistics] ...................... ::::::::::::::::" >> $Global:logFile
 "$(Get-Date) [STOP] script" >> $Global:logFile
 if ((Get-ChildItem -path $logfile).Length -gt 5242880) {
     Remove-Item -Path $Global:logFile
