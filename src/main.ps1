@@ -119,10 +119,23 @@ do {
 $freshServiceRelationships = Get-NewFreshServiceManageRelationships
 
 #Look for Dinotronic Managed Services
-$results = $assetTypeListExtendedProperties | Where-Object {$_.Keys -eq 7001249774 -or $_.values.parent_asset_type_id -eq 7001249774 -or $_.values.parent_asset_type_id -eq 7001249908}
-$services = $results | ForEach-Object {$freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.id, 1)}
-$x = 1
+$results = $assetTypeListExtendedProperties.GetEnumerator() | Where-Object {
+    $_.Key -eq 7001249774 -or 
+    $_.value.parent_asset_type_id -eq 7001249774 -or 
+    $_.value.parent_asset_type_id -eq 7001249908
+}
 
+$page = 1
+$results.GetEnumerator() | ForEach-Object {
+    do {
+        $assets = $freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.Key, $page)
+        $services += $assets
+        $page++
+    } while ($assets.assets.Count -eq 30)
+    $page = 1
+}
+
+$x = 1
 $Global:hash = @{}
 Foreach ($service in $services.assets){
     "Service $x" >> $Global:logFile

@@ -31,7 +31,7 @@ class FreshServiceManageAssets {
         return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "GET"
     }
 
-    [Object] getFreshServiceItemsWithQuery([String] $type, [String] $query, [String] $page){
+    [Array] getFreshServiceItemsWithQuery([String] $type, [String] $query, [String] $page){
         $url = "https://dinotronic.freshservice.com/api/v2/{0}?query=""{1}""&page={2}&include=type_fields" -f $type, $query, $page
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
         $headers = @{Authorization="Basic $($base64AuthInfo)"}
