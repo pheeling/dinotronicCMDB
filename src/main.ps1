@@ -99,11 +99,27 @@ foreach ($customer in $partnerCenterCustomerList){
     }
     # "$(Get-Date) [Customer Processing] Stop--------------------------" >> $Global:logFile
 }
-$assetTypeList = $freshServiceItems.getFreshServiceItems("asset_types", 1)
+
+#Get All Related Services
+$page = 1
+$type = "asset_types"
+$items = $freshServiceItems.getFreshServiceItems($type, $page)
+do {
+    foreach ($entry in $items.asset_types){
+        $assetTypeListExtendedProperties += @{$entry.id =  @{
+                                "name" = $entry.name
+                                "parent_asset_type_id" = $entry.parent_asset_type_id
+                                }
+                            }
+    } 
+    $page++
+    $items = $freshServiceItems.getFreshServiceItems($type,$page)
+} while ($items.asset_types.Count -ne 0)
+
 $freshServiceRelationships = Get-NewFreshServiceManageRelationships
 
 #Look for Dinotronic Managed Services
-$results = $assetTypeList.asset_types | Where-Object {$_.parent_asset_type_id -eq 7001249774 -or $_.id -eq 7001249774 }
+$results = $assetTypeListExtendedProperties | Where-Object {$_.Keys -eq 7001249774 -or $_.values.parent_asset_type_id -eq 7001249774 -or $_.values.parent_asset_type_id -eq 7001249908}
 $services = $results | ForEach-Object {$freshServiceItems.getFreshServiceItemsWithQuery("assets","asset_type_id:{0}" -f $_.id, 1)}
 $x = 1
 
