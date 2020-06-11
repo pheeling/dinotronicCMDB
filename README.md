@@ -14,10 +14,13 @@ It's an interface program between Microsofts CSP and external solution providers
 3.	Latest releases
     Checkout master branch on https://github.com/pheeling/dinotronicCMDB
 
-4.	API references
-    Conditional Access MS Graph API
+4.	References
+    PartnerCenter Module
     - https://github.com/microsoft/Partner-Center-PowerShell
     - https://docs.microsoft.com/en-us/powershell/partnercenter/install?view=partnercenterps-3.0
+    Freshservice API
+    - https://api.freshservice.com/v2/
+    - https://api.freshservice.com/
 
 # Build and Test
 TODO: Describe and show how to build your code and run the tests. 
