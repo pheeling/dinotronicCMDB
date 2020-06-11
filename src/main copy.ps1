@@ -3,6 +3,7 @@ $Global:mainPath = split-path -path $srcPath
 $Global:resourcespath = join-path -path "$mainPath" -ChildPath "resources"
 $Global:errorVariable = "Stop"
 $Global:logFile = "$resourcespath\processing.log"
+$Global:XflexInterfaceLog = "$resourcespath\XflexInterface.log"
 
 #Statistics
 $Global:APICalls = 0
@@ -38,7 +39,6 @@ $partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)
 $freshServiceItems = Get-NewFreshServiceManageAssets
 $assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types", $false)
 $xflex = Get-XflexAssetManagement
-$statusMail = Get-NewErrorHandling "Xflex Summary"
 <#$departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", $false)
 $assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets", $true)
 $freshServiceCiTypeId = $assetTypeList.Keys | Where-Object { $assetTypeList[$_] -eq 'Azure / Office 365 Subscription' }
@@ -182,8 +182,11 @@ Foreach ($service in $services.assets){
                 
                 #update xflex via API
                 #$xflex.setRegistration($registration, $quantity) and display results
-                $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
-                
+                #$response = $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
+                $service | Add-Member -MemberType NoteProperty -Name Response -Value @($response) -Force
+                $service | Add-Member -MemberType NoteProperty -Name Registration -Value @($registration) -Force
+                $xflex.responseResults += @($service)
+
             } catch {
                 "$(Get-Date) [Unknown] Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
                 Get-NewErrorHandling "Xflex API Severe Error" $PSitem
@@ -193,10 +196,15 @@ Foreach ($service in $services.assets){
     
 }
 
+#TODO test Summary
 #Send Xflex response summary
-$statusMail = Get-NewErrorHandling "Xflex Summary"
+$statusMail = Get-NewErrorHandling "Xflex Summary Simulation"
 foreach($entry in $xflex.responseResults){
-    $errorBody += @("<li>Reg: $($entry.Content)","$($entry.StatusDescription)</li>")
+    $errorBody += @("<li>--------</li>")
+    $errorBody += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
+    $errorBody += @("<li>Artikelnummer: $($entry.type_fields."$($artikelnummer)")</li>")
+    $errorBody += @("<li>Old Quantity: $($entry.Registration.QTY), New Quantity: $($entry.type_fields."$($quantityTypeFieldName)")</li>")
+    $errorBody += @("<li>Registration Status: $($entry.Response.Content)","$($entry.Response.StatusDescription)</li>")
 }
 $statusMail.sendMailwithInformMsgContent($errorBody)
 

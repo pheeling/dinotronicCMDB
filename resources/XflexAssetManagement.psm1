@@ -62,7 +62,6 @@ class XflexAssetManagement {
         $bodyJson = $body | ConvertTo-Json
         $response = Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json" -Method "POST"
         "$(Get-Date) [Xflex Update] Registration $($response.content) :: Update Status: $($response.StatusDescription)" >> $Global:logFile
-        $this.responseResults += $response
         return $response
         #return $this.convertContentToObject((Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json" -Method "POST"))
     }
