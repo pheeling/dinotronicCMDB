@@ -8,6 +8,9 @@ $Global:XflexInterfaceLog = "$resourcespath\XflexInterface.log"
 #Statistics
 $Global:APICalls = 0
 
+#Statistics
+$Global:APICalls = 0
+
 #Requirementcheck PartnerCenter Module
 if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
     try {
