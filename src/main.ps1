@@ -3,6 +3,7 @@ $Global:mainPath = split-path -path $srcPath
 $Global:resourcespath = join-path -path "$mainPath" -ChildPath "resources"
 $Global:errorVariable = "Stop"
 $Global:logFile = "$resourcespath\processing.log"
+$Global:XflexInterfaceLog = "$resourcespath\XflexInterface.log"
 
 #Statistics
 $Global:APICalls = 0
@@ -23,6 +24,7 @@ Import-Module -Force "$resourcespath\ErrorHandling.psm1"
 Import-Module -Force "$resourcespath\PartnerCenterCustomer.psm1"
 Import-Module -Force "$resourcespath\FreshServiceManageAssets.psm1"
 Import-Module -Force "$resourcespath\FreshServiceManageRelationships.psm1"
+Import-Module -Force "$resourcespath\XflexAssetManagement.psm1"
 Import-Module -Force "$resourcespath\GetHash.psm1"
 
 
@@ -40,6 +42,7 @@ $departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", 
 $assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets", $true)
 $freshServiceCiTypeId = $assetTypeList.Keys | Where-Object { $assetTypeList[$_] -eq 'Azure / Office 365 Subscription' }
 $hash = Get-NewGetHash
+$xflex = Get-XflexAssetManagement
 
 foreach ($customer in $partnerCenterCustomerList){
     $index = 0
@@ -138,6 +141,7 @@ $results.GetEnumerator() | ForEach-Object {
     $page = 1
 }
 
+#Update related items with new quantity count and update xflex related contract
 $x = 1
 $Global:hash = @{}
 Foreach ($service in $services.assets){
@@ -156,7 +160,49 @@ Foreach ($service in $services.assets){
         }
     }
     &{$freshServiceItems.updateFreshServiceItem($service.display_id,$quantitytable)} 3>&1 2>&1 >> $Global:logFile
+
+    $artikelnummer = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
+        if($_.Name -like "xflex_artikelnummer*"){$_.Name}}
+    $vertragsprojekt = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
+        if($_.Name -like "xflex_vertragsprojekt*"){$_.Name}}
+    
+    try {
+        $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
+        $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
+        $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
+    
+        #Keep Transaction Status for severe Xflex API errors
+        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
+        "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
+        foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
+            "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
+        }
+        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
+        
+        #update xflex via API
+        #$xflex.setRegistration($registration, $quantity) and display results
+        #$response = $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
+        $service | Add-Member -MemberType NoteProperty -Name Response -Value @($response) -Force
+        $service | Add-Member -MemberType NoteProperty -Name Registration -Value @($registration) -Force
+        $xflex.responseResults += @($service)
+
+    } catch {
+        "$(Get-Date) [Unknown] Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
+        Get-NewErrorHandling "Xflex API Severe Error" $PSitem
+    }
 }
+
+#TODO test Summary
+#Send Xflex response summary
+$statusMail = Get-NewErrorHandling "Xflex Summary Simulation"
+foreach($entry in $xflex.responseResults){
+    $errorBody += @("<li>--------</li>")
+    $errorBody += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
+    $errorBody += @("<li>Artikelnummer: $($entry.type_fields."$($artikelnummer)")</li>")
+    $errorBody += @("<li>Old Quantity: $($entry.Registration.QTY), New Quantity: $($entry.type_fields."$($quantityTypeFieldName)")</li>")
+    $errorBody += @("<li>Registration Status: $($entry.Response.Content)","$($entry.Response.StatusDescription)</li>")
+}
+$statusMail.sendMailwithInformMsgContent($errorBody)
 
 $partnerCenterAuthentication.disconnectPartnerCenter()
 "$(Get-Date) [Statistics] .......................::::::::::::::::" >> $Global:logFile
