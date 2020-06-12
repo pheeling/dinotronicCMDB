@@ -214,7 +214,7 @@ $statusMail = Get-NewErrorHandling "Xflex Summary Simulation"
 foreach($entry in $xflex.responseResults){
     $artikelnummer = $xflex.getArtikelPropertyName($entry.type_fields)
     $vertragsprojekt = $xflex.getProjektPropertyName($entry.type_fields)
-    $quantityTypeFieldName = $freshServiceItems.getQuantityPropertyName($service.type_fields)
+    $quantityTypeFieldName = $freshServiceItems.getQuantityPropertyName($entry.type_fields)
     $errorBody += @("<li>--------</li>")
     $errorBody += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
     $errorBody += @("<li>Artikelnummer: $($entry.type_fields."$($artikelnummer)")</li>")
