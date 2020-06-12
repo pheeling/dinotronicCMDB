@@ -66,4 +66,17 @@ class XflexAssetManagement {
         #return $this.convertContentToObject((Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json" -Method "POST"))
     }
 
+    [String] getArtikelPropertyName($string){
+        return $string | Get-Member -MemberType NoteProperty | ForEach-Object {
+            if($_.Name -like "xflex_artikelnummer*"){$_.Name}}
+    }
+
+    [String] getProjektPropertyName($string){
+        return $string | Get-Member -MemberType NoteProperty | ForEach-Object {
+            if($_.Name -like "xflex_vertragsprojekt*"){$_.Name}}
+    }
+
+    [String] cleanInputString($string){
+        return $string.trim()
+    }
 }

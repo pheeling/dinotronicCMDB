@@ -8,9 +8,6 @@ $Global:XflexInterfaceLog = "$resourcespath\XflexInterface.log"
 #Statistics
 $Global:APICalls = 0
 
-#Statistics
-$Global:APICalls = 0
-
 #Requirementcheck PartnerCenter Module
 if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
     try {
@@ -164,10 +161,8 @@ Foreach ($service in $services.assets){
     }
     &{$freshServiceItems.updateFreshServiceItem($service.display_id,$quantitytable)} 3>&1 2>&1 >> $Global:logFile
 
-    $artikelnummer = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
-        if($_.Name -like "xflex_artikelnummer*"){$_.Name}}
-    $vertragsprojekt = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
-        if($_.Name -like "xflex_vertragsprojekt*"){$_.Name}}
+    $artikelnummer = $xflex.getArtikelPropertyName($service.type_fields)
+    $vertragsprojekt = $xflex.getProjektPropertyName($service.type_fields)
     
     try {
         if ((-not [string]::IsNullOrEmpty($service.type_fields."$($artikelnummer)")) -and 
@@ -175,6 +170,10 @@ Foreach ($service in $services.assets){
             (-not [string]::IsNullOrEmpty($service.type_fields."$($vertragsprojekt)")) -and 
             ($service.type_fields."$($vertragsprojekt)" -isnot [array]))
             {
+
+            $service.type_fields."$($artikelnummer)" = $xflex.cleanInputString($service.type_fields."$($artikelnummer)")
+            $service.type_fields."$($vertragsprojekt)" = $xflex.cleanInputString($service.type_fields."$($vertragsprojekt)")
+
             $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
             $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
             $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
@@ -182,7 +181,7 @@ Foreach ($service in $services.assets){
             #Keep Transaction Status for severe Xflex API errors
             "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
             "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
-            foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
+            foreach($property in ($registration | Get-Member -ErrorAction Stop | Where-Object MemberType -like "noteproperty")){
                 "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
             }
             "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
@@ -200,15 +199,22 @@ Foreach ($service in $services.assets){
         $service | Add-Member -MemberType NoteProperty -Name Registration -Value @($registration) -Force
         $xflex.responseResults += @($service)
     } catch {
-        "$(Get-Date) [Unknown] Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
-        Get-NewErrorHandling "Xflex API Severe Error" $PSitem
+        "$(Get-Date) [Unknown] $($service.name) Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
+        Write-host $service.name
+        $response = [PSCustomObject]::new
+        $response | Add-Member -MemberType noteproperty -Name Content -Value "Bitte Artikel und Projektzuweisung aktualisieren" -force
+        $service | Add-Member -MemberType NoteProperty -Name Response -Value @($response) -Force
+        $xflex.responseResults += @($service)
+        $response = $null
+        #Get-NewErrorHandling "Xflex API Severe Error" $PSitem
     }
 }
 
-#TODO test Summary
 #Send Xflex response summary
 $statusMail = Get-NewErrorHandling "Xflex Summary Simulation"
 foreach($entry in $xflex.responseResults){
+    $artikelnummer = $xflex.getArtikelPropertyName($entry.type_fields)
+    $vertragsprojekt = $xflex.getProjektPropertyName($entry.type_fields)
     $errorBody += @("<li>--------</li>")
     $errorBody += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
     $errorBody += @("<li>Artikelnummer: $($entry.type_fields."$($artikelnummer)")</li>")
