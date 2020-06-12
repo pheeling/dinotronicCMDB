@@ -8,9 +8,6 @@ $Global:XflexInterfaceLog = "$resourcespath\XflexInterface.log"
 #Statistics
 $Global:APICalls = 0
 
-#Statistics
-$Global:APICalls = 0
-
 #Requirementcheck PartnerCenter Module
 if (!(Get-Module -ListAvailable -Name PartnerCenter)) {
     try {
@@ -33,19 +30,19 @@ Import-Module -Force "$resourcespath\GetHash.psm1"
 
 "$(Get-Date) [START] script" >> $Global:logFile
 
-$partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
+<#$partnerCenterAuthentication = Get-NewPartnerCenterAuthentication
 $partnerCenterAuthentication.getPartnerCenterConsent()
 $partnerCenterAuthentication.connectPartnerCenter()
 $partnerCenterCustomer = Get-NewPartnerCustomer
 $partnerCenterCustomerList = $partnerCenterCustomer.getPartnerCenterCustomer()
-$partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)
+$partnerCenterCustomer.getPartnerCenterSubscriptions($partnerCenterCustomerList)#>
 $freshServiceItems = Get-NewFreshServiceManageAssets
 $assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types", $false)
-$departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", $false)
+$xflex = Get-XflexAssetManagement
+<#$departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", $false)
 $assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets", $true)
 $freshServiceCiTypeId = $assetTypeList.Keys | Where-Object { $assetTypeList[$_] -eq 'Azure / Office 365 Subscription' }
 $hash = Get-NewGetHash
-$xflex = Get-XflexAssetManagement
 
 foreach ($customer in $partnerCenterCustomerList){
     $index = 0
@@ -107,9 +104,8 @@ foreach ($customer in $partnerCenterCustomerList){
         # "$(Get-Date) [Offer Processing] Stop--------------------------" >> $Global:logFile
     }
     # "$(Get-Date) [Customer Processing] Stop--------------------------" >> $Global:logFile
-}
+}#>
 
-#Get All Related Services
 $page = 1
 $type = "asset_types"
 $items = $freshServiceItems.getFreshServiceItems($type, $page)
@@ -143,9 +139,9 @@ $results.GetEnumerator() | ForEach-Object {
     } while ($assets.assets.Count -eq 30)
     $page = 1
 }
+$x = 1
 
 #Update related items with new quantity count and update xflex related contract
-$x = 1
 $Global:hash = @{}
 Foreach ($service in $services.assets){
     "Service $x" >> $Global:logFile
@@ -169,30 +165,35 @@ Foreach ($service in $services.assets){
     $vertragsprojekt = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
         if($_.Name -like "xflex_vertragsprojekt*"){$_.Name}}
     
-    try {
-        $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
-        $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
-        $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
-    
-        #Keep Transaction Status for severe Xflex API errors
-        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
-        "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
-        foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
-            "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
-        }
-        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
-        
-        #update xflex via API
-        #$xflex.setRegistration($registration, $quantity) and display results
-        #$response = $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
-        $service | Add-Member -MemberType NoteProperty -Name Response -Value @($response) -Force
-        $service | Add-Member -MemberType NoteProperty -Name Registration -Value @($registration) -Force
-        $xflex.responseResults += @($service)
+    if($service.asset_type_id -eq 7001249808){
+        if (($service.type_fields."$($artikelnummer)"  -eq "100.22.4.01") -and ($service.type_fields."$($vertragsprojekt)" -eq "VA107282019")){
+            try {
+                $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
+                $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
+                $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
+            
+                #Keep Transaction Status for severe Xflex API errors
+                "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
+                "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
+                foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
+                    "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
+                }
+                "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
+                
+                #update xflex via API
+                #$xflex.setRegistration($registration, $quantity) and display results
+                #$response = $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
+                $service | Add-Member -MemberType NoteProperty -Name Response -Value @($response) -Force
+                $service | Add-Member -MemberType NoteProperty -Name Registration -Value @($registration) -Force
+                $xflex.responseResults += @($service)
 
-    } catch {
-        "$(Get-Date) [Unknown] Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
-        Get-NewErrorHandling "Xflex API Severe Error" $PSitem
+            } catch {
+                "$(Get-Date) [Unknown] Xflex API Error please check $Global:XflexInterfaceLog for Status" >> $Global:logFile
+                Get-NewErrorHandling "Xflex API Severe Error" $PSitem
+            }
+        }
     }
+    
 }
 
 #TODO test Summary
@@ -207,7 +208,7 @@ foreach($entry in $xflex.responseResults){
 }
 $statusMail.sendMailwithInformMsgContent($errorBody)
 
-$partnerCenterAuthentication.disconnectPartnerCenter()
+#$partnerCenterAuthentication.disconnectPartnerCenter()
 "$(Get-Date) [Statistics] .......................::::::::::::::::" >> $Global:logFile
 "$(Get-Date) [Statistics] FreshService API Calls  $Global:APICalls" >> $Global:logFile
 "$(Get-Date) [Statistics] .......................::::::::::::::::" >> $Global:logFile

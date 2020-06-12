@@ -11,8 +11,12 @@ class UserConfiguration {
     [String] $nativePartnerCenterAppId = ""
     [String] $tenantId = ""
     [pscredential] $webPartnerCenterCredentials
+    [pscredential] $xflexLoginData
+    [pscredential] $xflexCustomerId
     [String] $webPartnerCenterAppXMLFileName = "$Global:resourcespath\${env:USERNAME}_webPartnerCenterApp.xml"
     [String] $tenantAndNativeAppXMLFileName = "$Global:resourcespath\${env:USERNAME}_TenantandNativeAppId.xml"
+    [String] $xflexAuthenticationXMLFileName = "$Global:resourcespath\${env:USERNAME}_XflexAuthenticationXML.xml"
+    [String] $xflexCustomerIdXMLFileName = "$Global:resourcespath\${env:USERNAME}_XflexCustomerIdXML.xml"
 
     static [UserConfiguration] GetInstance() {
         if ([UserConfiguration]::instance -eq $null) { [UserConfiguration]::instance = [UserConfiguration]::new() }
@@ -22,29 +26,37 @@ class UserConfiguration {
     UserConfiguration(){
         if ((Test-Path $this.webPartnerCenterAppXMLFileName) -and 
             (Test-Path $this.tenantAndNativeAppXMLFileName) -and 
-            (Test-Path $this.freshServiceAPIKeyXMLFileName)) {
+            (Test-Path $this.freshServiceAPIKeyXMLFileName) -and
+            (Test-Path $this.xflexAuthenticationXMLFilename) -and
+            (Test-Path $this.xflexCustomerIdXMLFileName)) {
             $this.tenantId = $this.getTenantandNativePCAppId().tenantId
             $this.nativePartnerCenterAppId = $this.getTenantandNativePCAppId().nativePartnerCenterAppId
-            $this.webPartnerCenterCredentials = $this.getWebPartnerCenterAppIdAndSecretKey()
+            $this.webPartnerCenterCredentials = $this.importXMLDataAsPsCredential($this.webPartnerCenterAppXMLFileName)
             $this.freshServiceAPIKey = $this.getFreshServiceCredential().GetNetworkCredential().Password
+            $this.xflexLoginData = $this.importXMLDataAsPsCredential($this.xflexAuthenticationXMLFileName)
+            $this.xflexCustomerId = $this.importXMLDataAsPsCredential($this.xflexCustomerIdXMLFileName)
         }
         else {
             $this.setTenantandNativePCAppId()
-            $this.setWebPartnerCenterAppCredential()
+            $this.setXMLDataAsFiles($this.webPartnerCenterAppXMLFileName)
             $this.setFreshServiceCredential()
+            $this.setXMLDataAsFiles($this.xflexAuthenticationXMLFileName)
+            $this.setXMLDataAsFiles($this.xflexCustomerIdXMLFileName)
             $this.tenantId = $this.getTenantandNativePCAppId().tenantId
             $this.nativePartnerCenterAppId = $this.getTenantandNativePCAppId().nativePartnerCenterAppId
-            $this.webPartnerCenterCredentials = $this.getWebPartnerCenterAppIdAndSecretKey()
+            $this.webPartnerCenterCredentials = $this.importXMLDataAsPsCredential($this.webPartnerCenterAppXMLFileName)
             $this.freshServiceAPIKey = $this.getFreshServiceCredential().GetNetworkCredential().Password
+            $this.xflexLoginData = $this.importXMLDataAsPsCredential($this.xflexCustomerIdXMLFileName)
+            $this.xflexCustomerId = $this.importXMLDataAsPsCredential($this.xflexCustomerIdXMLFileName)
         }
     }
 
-    [PSCredential] getWebPartnerCenterAppIdAndSecretKey(){
-        return Import-Clixml $this.webPartnerCenterAppXMLFileName
+    [PSCredential] importXMLDataAsPsCredential($XMLFileName){
+        return Import-Clixml $XMLFileName
     }
 
-    setWebPartnerCenterAppCredential(){
-        Get-Credential | Export-Clixml -Path $this.webPartnerCenterAppXMLFileName
+    setXMLDataAsFiles($XMLFileName){
+        Get-Credential | Export-Clixml -Path $XMLFileName
     }
 
     setTenantandNativePCAppId(){
