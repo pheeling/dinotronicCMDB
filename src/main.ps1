@@ -149,9 +149,8 @@ Foreach ($service in $services.assets){
     $freshServiceRelationships.getRelationships($service.display_id)
     "$(Get-Date) " + $Global:hash["$($service.display_id)"] >> $Global:logFile
     $x++
-    $quantityTypeFieldName = $service.type_fields | Get-Member -MemberType NoteProperty | ForEach-Object {
-        if($_.Name -like "quantity*"){$_.Name}
-    }
+    $quantityTypeFieldName = $freshServiceItems.getQuantityPropertyName($service.type_fields)
+
     $quantitytable =@{
         asset =@{
             type_fields = @{
@@ -215,6 +214,7 @@ $statusMail = Get-NewErrorHandling "Xflex Summary Simulation"
 foreach($entry in $xflex.responseResults){
     $artikelnummer = $xflex.getArtikelPropertyName($entry.type_fields)
     $vertragsprojekt = $xflex.getProjektPropertyName($entry.type_fields)
+    $quantityTypeFieldName = $freshServiceItems.getQuantityPropertyName($service.type_fields)
     $errorBody += @("<li>--------</li>")
     $errorBody += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
     $errorBody += @("<li>Artikelnummer: $($entry.type_fields."$($artikelnummer)")</li>")

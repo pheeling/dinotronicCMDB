@@ -91,6 +91,11 @@ class FreshServiceManageAssets {
     return $itemsList
     }
 
+    [String] getQuantityPropertyName($string){
+        return $string | Get-Member -MemberType NoteProperty | ForEach-Object {
+            if($_.Name -like "quantity*"){$_.Name}}
+    }
+
     [Array] updateFreshServiceItem([String] $assetId, [Hashtable] $valuestable){
         try {
             $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
