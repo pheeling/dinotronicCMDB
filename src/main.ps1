@@ -170,8 +170,11 @@ Foreach ($service in $services.assets){
         if($_.Name -like "xflex_vertragsprojekt*"){$_.Name}}
     
     try {
-        if((-not [string]::IsNullOrEmpty($service.type_fields."$($artikelnummer)")) -and ($service.type_fields."$($artikelnummer)" -isnot [array]) -or
-        (-not [string]::IsNullOrEmpty($service.type_fields."$($vertragsprojekt)")) -and ($service.type_fields."$($vertragsprojekt)" -isnot [array])){
+        if ((-not [string]::IsNullOrEmpty($service.type_fields."$($artikelnummer)")) -and 
+            ($service.type_fields."$($artikelnummer)" -isnot [array]) -and
+            (-not [string]::IsNullOrEmpty($service.type_fields."$($vertragsprojekt)")) -and 
+            ($service.type_fields."$($vertragsprojekt)" -isnot [array]))
+            {
             $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
             $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
             $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
