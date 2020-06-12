@@ -46,7 +46,7 @@ class UserConfiguration {
             $this.nativePartnerCenterAppId = $this.getTenantandNativePCAppId().nativePartnerCenterAppId
             $this.webPartnerCenterCredentials = $this.importXMLDataAsPsCredential($this.webPartnerCenterAppXMLFileName)
             $this.freshServiceAPIKey = $this.getFreshServiceCredential().GetNetworkCredential().Password
-            $this.xflexLoginData = $this.importXMLDataAsPsCredential($this.xflexCustomerIdXMLFileName)
+            $this.xflexLoginData = $this.importXMLDataAsPsCredential($this.xflexAuthenticationXMLFileName)
             $this.xflexCustomerId = $this.importXMLDataAsPsCredential($this.xflexCustomerIdXMLFileName)
         }
     }
