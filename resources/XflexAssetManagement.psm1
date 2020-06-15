@@ -28,6 +28,7 @@ class XflexAssetManagement {
 
     [PSCustomObject] getMaterials([String] $materialnumber){
         $url = "https://rest.xflex.ch/api/matread"
+        $this.validation($materialNumber)
         $body = $this.getLoginData()
         $body.MATINR = $materialnumber
         $bodyJson = $body | ConvertTo-Json
@@ -36,6 +37,7 @@ class XflexAssetManagement {
 
     [PSCustomObject] getProjects([String] $projectNumber){
         $url = "https://rest.xflex.ch/api/project"
+        $this.validation($projectNumber)
         $body = $this.getLoginData()
         $body.PROINR = $projectNumber
         $bodyJson = $body | ConvertTo-Json
@@ -44,6 +46,8 @@ class XflexAssetManagement {
 
     [PSCustomObject] getRegistration([String] $internalMaterialNumber, [String]$internalProjectNumber){
         $url = "https://rest.xflex.ch/api/regread"
+        $this.validation($internalMaterialNumber)
+        $this.validation($internalProjectNumber)
         $body = $this.getLoginData()
         $body.MATNR = $internalMaterialNumber
         $body.PRONR = $internalProjectNumber
@@ -53,6 +57,8 @@ class XflexAssetManagement {
 
     [PSCustomObject] setRegistration([PSCustomObject] $registration, [int] $quantity){
         $url = "https://rest.xflex.ch/api/regadd"
+        $this.validation($registration)
+        $this.validation($quantity)
         $body = $this.getLoginData()
         $body.REG = @{}
         foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
@@ -78,5 +84,12 @@ class XflexAssetManagement {
 
     [String] cleanInputString($string){
         return $string.trim()
+    }
+
+    [Exception] validation($string){
+        if ([string]::IsNullOrEmpty($string) -or ($string -is [array])){
+            return throw "Failed Validation"
+            }
+        return $null
     }
 }

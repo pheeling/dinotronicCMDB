@@ -164,33 +164,18 @@ Foreach ($service in $services.assets){
     $vertragsprojekt = $xflex.getProjektPropertyName($service.type_fields)
     
     try {
-        if ((-not [string]::IsNullOrEmpty($service.type_fields."$($artikelnummer)")) -and 
-            ($service.type_fields."$($artikelnummer)" -isnot [array]) -and
-            (-not [string]::IsNullOrEmpty($service.type_fields."$($vertragsprojekt)")) -and 
-            ($service.type_fields."$($vertragsprojekt)" -isnot [array]))
-            {
-
-            $service.type_fields."$($artikelnummer)" = $xflex.cleanInputString($service.type_fields."$($artikelnummer)")
-            $service.type_fields."$($vertragsprojekt)" = $xflex.cleanInputString($service.type_fields."$($vertragsprojekt)")
-
-            $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
-            $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
-            $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
-
-            #Keep Transaction Status for severe Xflex API errors
-            "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
-            "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
-            foreach($property in ($registration | Get-Member -ErrorAction Stop | Where-Object MemberType -like "noteproperty")){
-                "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
-            }
-            "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
-        } else {
-            #Keep Transaction Status for severe Xflex API errors
-            "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
-            "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
-            "$(Get-Date) [Xflex API] $($service.name) has no artikel or projektnummer" >> $Global:XflexInterfaceLog
+        $service.type_fields."$($artikelnummer)" = $xflex.cleanInputString($service.type_fields."$($artikelnummer)")
+        $service.type_fields."$($vertragsprojekt)" = $xflex.cleanInputString($service.type_fields."$($vertragsprojekt)")
+        $material = $xflex.getMaterials($service.type_fields."$($artikelnummer)")
+        $project = $xflex.getProjects($service.type_fields."$($vertragsprojekt)")
+        $registration = $xflex.getRegistration($material.MATNR, $project.PRONR)
+        #Keep Transaction Status for severe Xflex API errors
+        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
+        "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
+        foreach($property in ($registration | Get-Member -ErrorAction Stop | Where-Object MemberType -like "noteproperty")){
+            "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
         }
-
+        "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
         #update xflex via API
         #$xflex.setRegistration($registration, $quantity) and display results
         #$response = $xflex.setRegistration($registration, $service.type_fields."$($quantityTypeFieldName)")
