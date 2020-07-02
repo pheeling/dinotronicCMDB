@@ -6,7 +6,7 @@ class XflexAssetManagement {
 
     $userconfiguration
     [Hashtable] $authentication
-    [Array] $responseResults
+    $responseResults = [System.Collections.ArrayList]::New()
 
     XflexAssetManagement (){
         $this.userConfiguration = Get-NewUserConfiguration
@@ -23,6 +23,7 @@ class XflexAssetManagement {
     }
 
     [PSCustomObject] convertContentToObject($response){
+        $this.validation($response)
         return $response.Content | ConvertFrom-Json
     }
 
@@ -86,10 +87,19 @@ class XflexAssetManagement {
         return $string.trim()
     }
 
-    [Exception] validation($string){
-        if ([string]::IsNullOrEmpty($string) -or ($string -is [array])){
-            return throw "Failed Validation"
-            }
+    [Exception] validation($value){
+        if ([string]::IsNullOrEmpty($value) -or ($value -is [array])){
+            return Write-Error -Exception ([System.ArgumentNullException]::New("Value is null or empty, failed validation")) -ErrorAction Stop
+        }
+        if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/matread") -and ($value.content -eq "[]")){
+            return Write-Error -Exception ([System.MissingMemberException]::New("Wrong material number")) -ErrorAction Stop
+        } 
+        if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/project") -and ($value.content -eq "[]")){
+            return Write-Error -Exception ([System.MissingMemberException]::New("Wrong project number")) -ErrorAction Stop
+        } 
+        if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/regread") -and ($value.content -eq "[]")){
+            return Write-Error -Exception ([System.MissingMemberException]::New("No Booking available under this material and project number")) -ErrorAction Stop
+        }
         return $null
     }
 }
