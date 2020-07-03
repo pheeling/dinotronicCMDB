@@ -58,8 +58,9 @@ class XflexAssetManagement {
 
     [PSCustomObject] setRegistration([PSCustomObject] $registration, [int] $quantity){
         $url = "https://rest.xflex.ch/api/regadd"
-        $this.validation($registration)
+        #$this.validation($registration)
         $this.validation($quantity)
+        $this.validation("$($registration.QTY)".TrimEnd(".0000"),$quantity)
         $body = $this.getLoginData()
         $body.REG = @{}
         foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){
@@ -84,12 +85,13 @@ class XflexAssetManagement {
     }
 
     [String] cleanInputString($string){
+        $this.validation($string)
         return $string.trim()
     }
 
     [Exception] validation($value){
         if ([string]::IsNullOrEmpty($value) -or ($value -is [array])){
-            return Write-Error -Exception ([System.ArgumentNullException]::New("Value is null or empty, failed validation")) -ErrorAction Stop
+            return Write-Error -Exception ([System.ArgumentNullException]::New("Value is null or empty")) -ErrorAction Stop
         }
         if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/matread") -and ($value.content -eq "[]")){
             return Write-Error -Exception ([System.MissingMemberException]::New("Wrong material number")) -ErrorAction Stop
@@ -99,6 +101,13 @@ class XflexAssetManagement {
         } 
         if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/regread") -and ($value.content -eq "[]")){
             return Write-Error -Exception ([System.MissingMemberException]::New("No Booking available under this material and project number")) -ErrorAction Stop
+        }
+        return $null
+    }
+
+    [Exception] validation($valueA, $valueB){
+        if ($valueA -eq $valueB){
+            return Write-Error -Exception ([System.IO.IOException]::New("Input values are equal")) -ErrorAction Stop
         }
         return $null
     }
