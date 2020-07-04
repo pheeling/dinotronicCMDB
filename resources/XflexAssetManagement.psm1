@@ -68,7 +68,8 @@ class XflexAssetManagement {
         }
         $body.REG.qty = $quantity
         $bodyJson = $body | ConvertTo-Json
-        $response = Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json" -Method "POST"
+        #TODO Nullreference Error beim Testen
+        $response = Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json; charset=utf-8" -Method "POST"
         "$(Get-Date) [Xflex Update] Registration $($response.content) :: Update Status: $($response.StatusDescription)" >> $Global:logFile
         return $response
         #return $this.convertContentToObject((Invoke-WebRequest -Uri $url -Body $bodyJson -ContentType "application/json" -Method "POST"))
@@ -91,7 +92,7 @@ class XflexAssetManagement {
 
     [Exception] validation($value){
         if ([string]::IsNullOrEmpty($value) -or ($value -is [array])){
-            return Write-Error -Exception ([System.ArgumentNullException]::New("Value is null or empty")) -ErrorAction Stop
+            return Write-Error -Exception ([System.ArgumentNullException]::New()) -ErrorAction Stop
         }
         if (($value.BaseResponse.ResponseUri.AbsolutePath -eq "/api/matread") -and ($value.content -eq "[]")){
             return Write-Error -Exception ([System.MissingMemberException]::New("Wrong material number")) -ErrorAction Stop
