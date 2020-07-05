@@ -30,7 +30,7 @@ Import-Module -Force "$resourcespath\GetHash.psm1"
 "$(Get-Date) [START] script" >> $Global:logFile
 
 $freshServiceItems = Get-NewFreshServiceManageAssets
-$assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types", $false)
+#$assetTypeList = $freshServiceItems.getFreshServiceItemsAsList("asset_types", $false)
 $xflex = Get-XflexAssetManagement
 
 $page = 1

@@ -42,7 +42,6 @@ $departmentsList = $freshServiceItems.getFreshServiceItemsAsList("departments", 
 $assetsList = $freshServiceItems.getFreshServiceItemsAsList("assets", $true)
 $freshServiceCiTypeId = $assetTypeList.Keys | Where-Object { $assetTypeList[$_] -eq 'Azure / Office 365 Subscription' }
 $hash = Get-NewGetHash
-$xflex = Get-XflexAssetManagement
 
 foreach ($customer in $partnerCenterCustomerList){
     $index = 0
