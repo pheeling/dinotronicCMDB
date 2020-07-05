@@ -21,6 +21,7 @@ class PartnerCenterCustomer {
                     Select-Object -Property offerId,SubscriptionId,offerName,quantity,effectiveStartDate,commitmentEndDate,status,billingCycle |
                     Sort-Object -Property offerName
                     $item | Add-Member -MemberType NoteProperty -Name SubscriptionsList -Value $subscriptions -Force
+                    "$(Get-Date) [PartnerCenter] Adding Subscriptions to Customer" >> $Global:logFile
                 } catch {
                     "DT: Issue adding Subscription: $($PSItem) : $($item.customerid): $($item.name)" >> $Global:logFile
                 }

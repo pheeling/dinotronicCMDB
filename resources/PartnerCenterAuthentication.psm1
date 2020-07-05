@@ -30,6 +30,8 @@ class PartnerCenterAuthentication {
             -AccessToken $pctoken.AccessToken `
             -ApplicationId $this.userConfiguration.nativePartnerCenterAppId `
             -TenantId $this.userConfiguration.tenantId
+
+            "$(Get-Date) [PartnerCenter] Connected to PartnerCenter" >> $Global:logFile
         } catch {
             "DT: Issue connecting CSP Data: $PSItem" >> $Global:logFile
             Get-NewErrorHandling "DT: Issue connection CSP Data" $PSItem
