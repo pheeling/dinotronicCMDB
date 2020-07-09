@@ -60,7 +60,7 @@ class XflexAssetManagement {
         $url = "https://rest.xflex.ch/api/regadd"
         #$this.validation($registration)
         $this.validation($quantity)
-        $this.validation("$($registration.QTY)".TrimEnd(".0000"),$quantity)
+        $this.validation([math]::Truncate("$($registration.QTY)"),$quantity)
         $body = $this.getLoginData()
         $body.REG = @{}
         foreach($property in ($registration | Get-Member | Where-Object MemberType -like "noteproperty")){

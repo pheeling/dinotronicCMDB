@@ -98,6 +98,7 @@ Foreach ($service in $services.assets){
         #Keep Transaction Status for severe Xflex API errors
         "$(Get-Date) [Xflex API] ===========================" >> $Global:XflexInterfaceLog
         "$(Get-Date) [Xflex API] New Registration processing" >> $Global:XflexInterfaceLog
+        "$(Get-Date) [Xflex API] $($service.type_fields."$($artikelnummer)")::$($service.type_fields."$($vertragsprojekt)")" >> $Global:XflexInterfaceLog
         foreach($property in ($registration | Get-Member -ErrorAction Stop | Where-Object MemberType -like "noteproperty")){
             "$(Get-Date) [Xflex API] $($property.name) $($registration."$($property.name)")" >> $Global:XflexInterfaceLog 
         }
@@ -152,7 +153,7 @@ foreach($entry in $xflex.responseResults){
             $quantityEqual += @("<br>")
             $quantityEqual += @("<li>Name: $($entry.name), Projekt: $($entry.type_fields."$($vertragsprojekt)")</li>")
             $quantityEqual += @("<li>Artikelnummer: $($entry.type_fields."$($articleNumber)")</li>")
-            $quantityEqual += @("<li>Old Quantity: $($entry.Registration.QTY), New Quantity: $($entry.type_fields."$($quantityTypeFieldName)")</li>")
+            $quantityEqual += @("<li>Quantity: $($entry.type_fields."$($quantityTypeFieldName)")</li>")
             $quantityEqual += @("<li>Registration Status: $($entry.Response.Content)","$($entry.Response.StatusDescription)</li>")
         }
         "System.ArgumentNullException: Value cannot be null."
@@ -196,18 +197,18 @@ foreach($entry in $xflex.responseResults){
         $OKregistration += @("<li>Registration Status: $($entry.Response.Content)","$($entry.Response.StatusDescription)</li>")
     }
 }
-$errorBody += @("<h3><u>registration equal</u></h3>")
-$errorBody += $quantityEqual
-$errorBody += @("<br><h3><u>no material or project number</u></h3>")
+$errorBody += @("<br><h3><u>registration updated</u></h3>")
+$errorBody += $OKregistration
+$errorBody += @("<br><h3><u>material or project number is empty</u></h3>")
 $errorBody += $nullOrEmpty
 $errorBody += @("<br><h3><u>wrong material Number</u></h3>")
 $errorBody += $wrongMaterialNumber
 $errorBody += @("<br><h3><u>wrong project Number</u></h3>")
 $errorBody += $wrongProjectNumber
-$errorBody += @("<br><h3><u>no registration</u></h3>")
+$errorBody += @("<br><h3><u>no registration available</u></h3>")
 $errorBody += $noRegistration
-$errorBody += @("<br><h3><u>registration updated</u></h3>")
-$errorBody += $OKregistration
+$errorBody += @("<h3><u>registration equal</u></h3>")
+$errorBody += $quantityEqual
 
 $statusMail.sendMailwithInformMsgContent($errorBody)
 
