@@ -197,7 +197,7 @@ foreach($entry in $xflex.responseResults){
         $OKregistration += @("<li>Registration Status: $($entry.Response.Content)","$($entry.Response.StatusDescription)</li>")
     }
 }
-$errorBody += @("<br><h3><u>registration updated</u></h3>")
+$errorBody += @("<h3><u>registration updated</u></h3>")
 $errorBody += $OKregistration
 $errorBody += @("<br><h3><u>material or project number is empty</u></h3>")
 $errorBody += $nullOrEmpty
@@ -207,7 +207,7 @@ $errorBody += @("<br><h3><u>wrong project Number</u></h3>")
 $errorBody += $wrongProjectNumber
 $errorBody += @("<br><h3><u>no registration available</u></h3>")
 $errorBody += $noRegistration
-$errorBody += @("<h3><u>registration equal</u></h3>")
+$errorBody += @("<br><h3><u>registration equal</u></h3>")
 $errorBody += $quantityEqual
 
 $statusMail.sendMailwithInformMsgContent($errorBody)
