@@ -88,7 +88,7 @@ foreach ($customer in $partnerCenterCustomerList){
             $valuestable.asset.department_id = $departmentId
         }
 
-        if($offer.status -eq "deleted" -and $freshServiceMatch){
+        if(($offer.status -eq "deleted" -and $freshServiceMatch) -or ($offer.status -eq "suspended" -and $freshServiceMatch)){
             &{$freshServiceItems.deleteFreshServiceItem($assetsList.$freshServiceMatch.displayId)} 3>&1 2>&1 >> $Global:logFile
             # "$(Get-Date) [Freshservice Delete] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         } elseif ($offer.status -ne "deleted" -and $freshServiceMatch){
