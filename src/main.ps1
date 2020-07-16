@@ -94,7 +94,7 @@ foreach ($customer in $partnerCenterCustomerList){
         } elseif ($offer.status -ne "deleted" -and $freshServiceMatch){
             &{$freshServiceItems.updateFreshServiceItem($assetsList.$freshServiceMatch.displayId,$valuestable)} 3>&1 2>&1 >> $Global:logFile
             # "$(Get-Date) [Freshservice Update] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
-        } elseif ($offer.status -ne "deleted") {
+        } elseif ($offer.status -ne "deleted" -and $offer.status -ne "suspended") {
             &{$freshServiceItems.createFreshServiceItem($valuestable)} 3>&1 2>&1 >> $Global:logFile
             # "$(Get-Date) [Freshservice Created] $($offer.status): $($offer.orderId): $($offer.OfferName): $($customer.Name)" >> $Global:logFile
         } else {
