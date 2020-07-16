@@ -128,11 +128,11 @@ class FreshServiceManageAssets {
 
     [Array] deleteFreshServiceItem([String] $assetId){
         try {
-            $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}" -f $assetId
+            $url = "https://dinotronic.freshservice.com/api/v2/assets/{0}/delete_forever" -f $assetId
             $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:X" -f $this.userConfiguration.freshServiceAPIKey)))
             $headers = @{Authorization="Basic $($base64AuthInfo)"}
             $Global:APICalls++
-            return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "DELETE" 
+            return Invoke-RestMethod -Uri $url -Headers $headers -ContentType "application/json" -Method "PUT" 
         } catch {
             #"DT: Deleting FreshServiceItem: $PSItem" >> $Global:logFile
             Get-NewErrorHandling "DT: Deleting FreshServiceItem" $PSItem
