@@ -33,7 +33,7 @@ class FreshServiceManageRelationships {
             }
             if ($end -eq 0){
                 $finalasset = $this.freshServiceItems.getFreshServiceItems("assets/{0}" -f $display_id)
-                if($finalasset.asset.type_fields.status_7001248569 -like "Suspended"){
+                if(-not $finalasset.asset.type_fields.status_7001248569){
                     $Global:hash[$display_id] = 0
                 } else { 
                     $Global:hash[$display_id] = $finalasset.asset.type_fields.quantity_7001248569 -as [int]
