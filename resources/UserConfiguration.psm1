@@ -23,6 +23,12 @@ class UserConfiguration {
           return [UserConfiguration]::instance
     }
 
+    #Order of password and key generation:
+    # 1. TenantID and Native Partner Center ID
+    # 2. WebPartnerApp ID and Secret key
+    # 3. FreshService Credential X:<APIKey>
+    # 4. Xflex Username and Password
+    # 5. Xflex Customer ID, password field not used
     UserConfiguration(){
         if ((Test-Path $this.webPartnerCenterAppXMLFileName) -and 
             (Test-Path $this.tenantAndNativeAppXMLFileName) -and 

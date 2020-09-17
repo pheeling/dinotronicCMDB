@@ -1,8 +1,15 @@
-function Get-NewErrorHandling($errorSubject, $errorBody){
-    return [ErrorHandling]::new($errorSubject, $errorBody)
-}
-function Get-NewErrorHandling($errorSubject){
-    return [ErrorHandling]::new($errorSubject)
+function Get-NewErrorHandling{
+    Param(
+    [Parameter(Mandatory=$true, Position=0)]
+    [String]$errorSubject,
+    [Parameter(Mandatory=$false, Position=1)]
+    $errorBody
+    )
+    if ($errorBody){
+        return [ErrorHandling]::new($errorSubject, $errorBody)
+    } else {
+        return [ErrorHandling]::new($errorSubject)
+    }
 }
 
 class ErrorHandling {
